@@ -1,0 +1,90 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+}
+
+#game-container {
+    width: 100%;
+    height: 100%;
+    max-width: 360px;
+    max-height: 640px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.screen {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-size: cover;
+    background-position: center;
+}
+
+#menu-screen {
+    background-image: url('menuBackground.png');
+}
+
+#game-screen {
+    background-color: #87CEEB;
+}
+
+#summary-screen {
+    background-image: url('gameSummary.png');
+}
+
+.hidden {
+    display: none;
+}
+
+#hud {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    color: white;
+    text-shadow: 1px 1px 2px black;
+}
+
+#game-area {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+button {
+    font-size: 18px;
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.draggable {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-color: white;
+    border: 2px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: move;
+    user-select: none;
+}
+
+.container {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 2px dashed black;
+    background-color: rgba(255, 255, 255, 0.5);
+}
