@@ -1,14 +1,20 @@
+import { isOverlapping } from './helpers.js';
+
 const numbers = [];
 const categories = ['Natural', 'Rational', 'Complex'];
 const containers = [];
 
 export function initMode1(gameArea) {
+    gameArea.style.backgroundImage = 'url("mode1Background.png")';
+    gameArea.style.backgroundSize = 'cover';
+    
     categories.forEach((category, index) => {
         const container = document.createElement('div');
         container.className = 'container';
         container.style.left = `${(index + 1) * 25}%`;
         container.style.bottom = '20%';
         container.dataset.category = category;
+        container.textContent = category;
         gameArea.appendChild(container);
         containers.push(container);
     });
@@ -38,8 +44,9 @@ export function playMode1(gameState, updateScore) {
         number.textContent = value;
         number.dataset.value = value;
         
-        const hammer = new Hammer(number);
-        hammer.on('pan', handlePan);
+        number.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
         
         return number;
     }
@@ -68,43 +75,54 @@ export function playMode1(gameState, updateScore) {
         }, 50);
     }
     
-    function handlePan(event) {
-        const number = event.target;
-        const posX = event.center.x - gameArea.offsetLeft - 25;
-        const posY = event.center.y - gameArea.offsetTop - 25;
-        
-        number.style.left = `${posX}px`;
-        number.style.top = `${posY}px`;
-        
-        if (event.isFinal) {
-            const category = getCategory(number.dataset.value);
+    let draggedElement = null;
+    let offsetX, offsetY;
+
+    function dragStart(e) {
+        draggedElement = e.target;
+        offsetX = e.clientX - draggedElement.getBoundingClientRect().left;
+        offsetY = e.clientY - draggedElement.getBoundingClientRect().top;
+        draggedElement.style.zIndex = 1000;
+    }
+
+    function drag(e) {
+        if (draggedElement) {
+            const gameAreaRect = gameArea.getBoundingClientRect();
+            let newX = e.clientX - gameAreaRect.left - offsetX;
+            let newY = e.clientY - gameAreaRect.top - offsetY;
+            
+            newX = Math.max(0, Math.min(newX, gameAreaRect.width - draggedElement.offsetWidth));
+            newY = Math.max(0, Math.min(newY, gameAreaRect.height - draggedElement.offsetHeight));
+            
+            draggedElement.style.left = `${newX}px`;
+            draggedElement.style.top = `${newY}px`;
+        }
+    }
+
+    function dragEnd() {
+        if (draggedElement) {
+            const category = getCategory(draggedElement.dataset.value);
             const container = containers.find(c => c.dataset.category === category);
             
-            if (isOverlapping(number, container)) {
+            if (isOverlapping(draggedElement, container)) {
                 updateScore(1);
-                gameArea.removeChild(number);
-                numbers.splice(numbers.indexOf(number), 1);
+                gameArea.removeChild(draggedElement);
+                numbers.splice(numbers.indexOf(draggedElement), 1);
             }
+            
+            draggedElement.style.zIndex = '';
+            draggedElement = null;
         }
     }
     
     function getCategory(value) {
-        if (!isNaN(value) && Number.isInteger(Number(value))) {
+        if (!isNaN(value) && Number.isInteger(Number(value)) && Number(value) >= 0) {
             return 'Natural';
         } else if (!isNaN(value)) {
             return 'Rational';
         } else {
             return 'Complex';
         }
-    }
-    
-    function isOverlapping(elem1, elem2) {
-        const rect1 = elem1.getBoundingClientRect();
-        const rect2 = elem2.getBoundingClientRect();
-        return !(rect1.right < rect2.left || 
-                 rect1.left > rect2.right || 
-                 rect1.bottom < rect2.top || 
-                 rect1.top > rect2.bottom);
     }
     
     const spawnInterval = setInterval(spawnNumber, 2000);
