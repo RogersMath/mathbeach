@@ -12,6 +12,7 @@ const menuScreen = document.getElementById('menu-screen');
 const gameScreen = document.getElementById('game-screen');
 const summaryScreen = document.getElementById('summary-screen');
 const startButton = document.getElementById('start-button');
+const instructionsButton = document.getElementById('instructions-button');
 const playAgainButton = document.getElementById('play-again-button');
 const scoreValue = document.getElementById('score-value');
 const timerValue = document.getElementById('timer-value');
@@ -22,6 +23,7 @@ backgroundMusic.loop = true;
 
 function initGame() {
     startButton.addEventListener('click', startGame);
+    instructionsButton.addEventListener('click', showInstructions);
     playAgainButton.addEventListener('click', resetGame);
     initMode1(gameArea);
     initMode2(gameArea);
@@ -30,8 +32,12 @@ function initGame() {
 function startGame() {
     menuScreen.classList.add('hidden');
     gameScreen.classList.remove('hidden');
-    backgroundMusic.play();
+    backgroundMusic.play().catch(e => console.error("Error playing background music:", e));
     startMode(1);
+}
+
+function showInstructions() {
+    alert("Sort the falling number boxes into the correct categories: Natural, Rational, or Complex. Drag and drop the boxes into the correct container to score points!");
 }
 
 function startMode(mode) {
@@ -66,7 +72,7 @@ function updateTimer() {
 function updateScore(points) {
     gameState.score += points;
     scoreValue.textContent = gameState.score;
-    new Audio('success.mp3').play();
+    new Audio('success.mp3').play().catch(e => console.error("Error playing success sound:", e));
 }
 
 function endGame() {
